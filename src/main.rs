@@ -14,6 +14,7 @@ use crate::frontend::app::App as Frontend;
 use relm::Widget;
 
 fn main() {
-    let core = Core::run();
+    let core = Core::new();
+    core.run();
     // Frontend::run(()).unwrap();
 }

@@ -9,6 +9,7 @@ pub struct Core {
     versions: Versions,
 }
 
+#[derive(Debug)]
 struct Versions {
     config_version: c_int,
     debug_version: c_int,
@@ -24,16 +25,16 @@ impl Core {
     }
 
     fn get_api_versions() -> Result<Versions, MupenError> {
-        let config_version = 0 as c_int;
-        let debug_version = 0 as c_int;
-        let vidext_version = 0 as c_int;
-        let extra_version = 0 as c_int;
+        let mut config_version = 0 as c_int;
+        let mut debug_version = 0 as c_int;
+        let mut vidext_version = 0 as c_int;
+        let mut extra_version = 0 as c_int;
         unsafe {
             let m64p_error = CoreGetAPIVersions(
-                config_version as *mut c_int,
-                debug_version as *mut c_int,
-                vidext_version as *mut c_int,
-                extra_version as *mut c_int,
+                &mut config_version,
+                &mut debug_version,
+                &mut vidext_version,
+                &mut extra_version,
             );
             match m64p_error {
                 M64pError::Success => Ok(Versions {
@@ -48,6 +49,7 @@ impl Core {
     }
 
     pub fn startup(&self) -> Result<(), MupenError> {
+        dbg!(&self.versions);
         let config_path = std::ptr::null() as *const c_char;
         let data_path = std::ptr::null() as *const c_char;
         let context = std::ptr::null() as *const c_void;
@@ -71,7 +73,7 @@ impl Core {
         }
     }
 
-    pub fn open_rom() -> Result<(), MupenError> {
+    pub fn open_rom(&self) -> Result<(), MupenError> {
         unsafe {
             let m64p_error = CoreDoCommand(
                 M64pCommand::RomOpen,

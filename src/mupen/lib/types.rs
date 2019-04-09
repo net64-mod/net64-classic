@@ -1,4 +1,9 @@
-use libc::c_uint;
+use libc::{c_int, c_uint};
+
+const CONFIG_VERSION: c_int = 131840;
+const DEBUG_VERSION: c_int = 131072;
+const VIDEXT_VERSION: c_int = 196608;
+const EXTRA_VERSION: c_int = 0;
 
 #[repr(C)]
 pub enum M64pPluginType {
