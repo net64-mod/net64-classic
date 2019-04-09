@@ -1,5 +1,5 @@
-use crate::backend::emulator::Emulator;
 use crate::mupen::Core;
+use super::emulator::Emulator;
 
 pub struct App {
     core: Core,
