@@ -1,5 +1,5 @@
 mod error;
-mod libmupen;
+mod lib;
 mod mupen;
 
 pub use mupen::*;

@@ -1,4 +1,4 @@
-use super::libmupen::{CoreErrorMessage, M64pError};
+use super::lib::{CoreErrorMessage, M64pError};
 
 use std::convert::From;
 use std::error::Error;

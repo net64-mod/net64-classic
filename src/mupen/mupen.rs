@@ -1,5 +1,5 @@
 use super::error::MupenError;
-use super::libmupen::{CoreDoCommand, CoreGetAPIVersions, CoreStartup, M64pCommand, M64pError};
+use super::lib::{CoreDoCommand, CoreGetAPIVersions, CoreStartup, M64pCommand, M64pError};
 
 use libc::{c_char, c_int, c_void};
 
@@ -51,9 +51,9 @@ impl Core {
         let config_path = std::ptr::null() as *const c_char;
         let data_path = std::ptr::null() as *const c_char;
         let context = std::ptr::null() as *const c_void;
-        let debug_callback = std::ptr::null() as *const c_void;
+        let debug_callback = std::ptr::null();
         let context2 = std::ptr::null() as *const c_void;
-        let state_callback = std::ptr::null() as *const c_void;
+        let state_callback = std::ptr::null();
         unsafe {
             let m64p_error = CoreStartup(
                 self.versions.config_version,
