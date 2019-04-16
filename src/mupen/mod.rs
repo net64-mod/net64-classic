@@ -1,4 +1,3 @@
-mod error;
 mod lib;
 mod mupen;
 

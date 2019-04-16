@@ -1,22 +1,26 @@
 use super::types::*;
+use super::{Mupen64Plus, Mupen64PlusPlugin};
 
-use libc::{c_char, c_float, c_int, c_void};
+use libc::{c_char, c_int, c_void};
+use libloading::{Library, Symbol};
 
-#[link(name = "mupen64plus")]
-extern "C" {
-    pub fn PluginStartup(
-        core_lib_handle: *const c_void,
+type PluginStartup = unsafe fn(
+    *const Library,
+    *const c_void,
+    Option<extern "C" fn(*const c_void, c_int, *const c_char)>,
+) -> M64pError;
+
+impl Mupen64PlusPlugin {
+    pub fn plugin_startup(
+        &self,
+        core: &Mupen64Plus,
         context: *const c_void, // can be null
-        debug_callback: *const extern "C" fn(*const c_void, c_int, *const c_char), // can be null
-    ) -> M64pError;
+        debug_callback: Option<extern "C" fn(*const c_void, c_int, *const c_char)>,
+    ) -> M64pError {
+        unsafe {
+            let plugin_startup: Symbol<PluginStartup> = self.lib.get(b"PluginStartup").unwrap();
 
-    pub fn PluginShutdown() -> M64pError;
-
-    pub fn PluginGetVersion(
-        plugin_type: *const M64pPluginType,
-        plugin_version: *const c_int,
-        api_version: *const c_int,
-        plugin_name: *const *const c_char,
-        capabilities: *const c_int,
-    ) -> M64pError;
+            plugin_startup(&core.lib, context, debug_callback)
+        }
+    }
 }

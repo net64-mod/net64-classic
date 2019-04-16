@@ -17,4 +17,8 @@ impl App {
     pub fn run(&self) {
         self.core.open_rom().expect("Core run failed");
     }
+
+    pub fn startup_plugins(&self) {
+        self.core.startup_plugins().expect("Core run failed");
+    }
 }
