@@ -6,6 +6,7 @@ const VIDEXT_VERSION: c_int = 196608;
 const EXTRA_VERSION: c_int = 0;
 
 #[repr(C)]
+#[derive(Debug)]
 pub enum M64pPluginType {
     Null = 0,
     Rsp = 1,

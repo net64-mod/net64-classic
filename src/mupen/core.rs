@@ -1,6 +1,7 @@
 use crate::platform::{DEFAULT_DYNLIB, LIB_SEARCH_DIRS, PLUGIN_SEARCH_DIRS};
 
-use super::lib::{M64pCommand, M64pError, Mupen64Plus, Mupen64PlusPlugin, MupenError};
+use super::lib::{M64pCommand, M64pError, M64pPluginType, Mupen64Plus, MupenError, Version};
+use super::plugin::MupenPlugin;
 
 use libc::{c_char, c_int, c_void};
 use libloading::Library;
@@ -10,37 +11,43 @@ use std::path::PathBuf;
 
 static SM64_ROM: &[u8] = include_bytes!("../../Super Mario 64 (USA).n64");
 
-pub struct Core {
+pub struct MupenCore {
     lib: Mupen64Plus,
     plugins: Plugins,
-    versions: Versions,
+    version: Version,
+    api_versions: ApiVersions,
 }
 
 #[derive(Debug)]
 struct Plugins {
-    audio: Mupen64PlusPlugin,
-    input: Mupen64PlusPlugin,
-    rsp: Mupen64PlusPlugin,
-    video: Mupen64PlusPlugin,
+    audio: MupenPlugin,
+    input: MupenPlugin,
+    rsp: MupenPlugin,
+    video: MupenPlugin,
 }
 
 #[derive(Debug)]
-struct Versions {
+struct ApiVersions {
     config_version: c_int,
     debug_version: c_int,
     vidext_version: c_int,
     extra_version: c_int,
 }
 
-impl Core {
+impl MupenCore {
     pub fn new() -> Self {
-        let lib = Self::load_lib().expect("Core::load_lib() failed");
-        let plugins = Self::load_plugins().expect("Core::load_plugins() failed");
-        let versions = Self::get_api_versions(&lib).expect("Core::get_api_versions() failed");
+        let lib = Self::load_lib().expect("MupenCore::load_lib() failed");
+        let plugins = Self::load_plugins(&lib).expect("MupenCore::load_plugins() failed");
+        let version = Self::get_core_version(&lib).expect("MupenCore::get_core_version() failed");
+        let api_versions =
+            Self::get_api_versions(&lib).expect("MupenCore::get_api_versions() failed");
+        dbg!(&version);
+        dbg!(&api_versions);
         Self {
             lib,
             plugins,
-            versions,
+            version,
+            api_versions,
         }
     }
 
@@ -55,7 +62,7 @@ impl Core {
         panic!("Mupen64Plus library not found");
     }
 
-    fn load_plugins() -> Result<Plugins, io::Error> {
+    fn load_plugins(lib: &Mupen64Plus) -> Result<Plugins, io::Error> {
         let mut audio_plugin = Err(io::Error::new(
             io::ErrorKind::NotFound,
             "Audio plugin not found",
@@ -115,14 +122,39 @@ impl Core {
             }
         }
         return Ok(Plugins {
-            audio: Library::new(audio_plugin?).unwrap().into(),
-            input: Library::new(input_plugin?).unwrap().into(),
-            rsp: Library::new(rsp_plugin?).unwrap().into(),
-            video: Library::new(video_plugin?).unwrap().into(),
+            audio: MupenPlugin::new(lib, Library::new(audio_plugin?).unwrap().into()),
+            input: MupenPlugin::new(lib, Library::new(input_plugin?).unwrap().into()),
+            rsp: MupenPlugin::new(lib, Library::new(rsp_plugin?).unwrap().into()),
+            video: MupenPlugin::new(lib, Library::new(video_plugin?).unwrap().into()),
         });
     }
 
-    fn get_api_versions(lib: &Mupen64Plus) -> Result<Versions, MupenError> {
+    fn get_core_version(lib: &Mupen64Plus) -> Result<Version, MupenError> {
+        let mut plugin_type = M64pPluginType::Core as M64pPluginType;
+        let mut plugin_version = 0 as c_int;
+        let mut api_version = 0 as c_int;
+        let mut plugin_name = '0' as c_char;
+        let mut capabilities = 0 as c_int;
+        let m64p_error = lib.plugin_get_version(
+            &mut plugin_type,
+            &mut plugin_version,
+            &mut api_version,
+            &mut plugin_name,
+            &mut capabilities,
+        );
+        match m64p_error {
+            M64pError::Success => Ok(Version::new(
+                plugin_type,
+                plugin_version,
+                api_version,
+                plugin_name,
+                capabilities,
+            )),
+            _ => Err(MupenError::new(lib, m64p_error)),
+        }
+    }
+
+    fn get_api_versions(lib: &Mupen64Plus) -> Result<ApiVersions, MupenError> {
         let mut config_version = 0 as c_int;
         let mut debug_version = 0 as c_int;
         let mut vidext_version = 0 as c_int;
@@ -135,7 +167,7 @@ impl Core {
         );
 
         match m64p_error {
-            M64pError::Success => Ok(Versions {
+            M64pError::Success => Ok(ApiVersions {
                 config_version,
                 debug_version,
                 vidext_version,
@@ -146,8 +178,6 @@ impl Core {
     }
 
     pub fn startup(&self) -> Result<(), MupenError> {
-        dbg!(&self.versions);
-        println!("{:x}", &self.versions.config_version);
         let config_path = std::ptr::null() as *const c_char;
         let data_path = std::ptr::null() as *const c_char;
         let context = std::ptr::null() as *const c_void;
@@ -156,7 +186,7 @@ impl Core {
         let state_callback = std::ptr::null();
         unsafe {
             let m64p_error = self.lib.core_startup(
-                131841, // self.versions.config_version,
+                0x20101, // self.versions.config_version,
                 &*config_path,
                 &*data_path,
                 &*context,
@@ -167,11 +197,12 @@ impl Core {
             match m64p_error {
                 M64pError::Success => Ok(()),
                 _ => Err(MupenError::new(&self.lib, m64p_error)),
-            }
+            }?;
         }
+        self.startup_plugins()
     }
 
-    pub fn startup_plugins(&self) -> Result<(), MupenError> {
+    fn startup_plugins(&self) -> Result<(), MupenError> {
         self.startup_video_plugin()?;
         // self.startup_audio_plugin()?;
         // self.startup_input_plugin()?;
@@ -185,7 +216,7 @@ impl Core {
         let m64p_error = self
             .plugins
             .video
-            .plugin_startup(&self.lib, context, debug_callback);
+            .startup(&self.lib, context, debug_callback);
         match m64p_error {
             M64pError::Success => Ok(()),
             _ => Err(MupenError::new(&self.lib, m64p_error)),

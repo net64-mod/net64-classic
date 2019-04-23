@@ -1,14 +1,14 @@
 use super::emulator::Emulator;
-use crate::mupen::Core;
+use crate::mupen::MupenCore;
 
 pub struct App {
-    core: Core,
+    core: MupenCore,
     emulator: Emulator,
 }
 
 impl App {
     pub fn new() -> App {
-        let core = Core::new();
+        let core = MupenCore::new();
         let emulator = Emulator::new();
         core.startup().expect("Core startup failed");
         App { core, emulator }
@@ -16,9 +16,5 @@ impl App {
 
     pub fn run(&self) {
         self.core.open_rom().expect("Core run failed");
-    }
-
-    pub fn startup_plugins(&self) {
-        self.core.startup_plugins().expect("Core run failed");
     }
 }

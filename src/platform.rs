@@ -1,5 +1,5 @@
 #[cfg(target_os = "linux")]
-pub static DEFAULT_DYNLIB: &str = "libmupen64plus.so.2";
+pub static DEFAULT_DYNLIB: &str = "libmupen64plus.so.2.0.0";
 
 #[cfg(target_os = "linux")]
 pub static DLL_EXT: &str = ".so";
@@ -9,9 +9,10 @@ pub static DLL_FILTER: &str = ".so.2";
 
 #[cfg(target_os = "linux")]
 pub static LIB_SEARCH_DIRS: [&str; 1] = [
-    // "./lib/mupen64plus-bundle-linux64-2.5",
+    // "./lib/mupen64plus-bundle-linux64-2.5.9",
     "/usr/lib",
     // "/usr/lib64",
+    // "/usr/local/lib"
     // "/lib",
     // "/lib64",
     // ".",
@@ -19,7 +20,7 @@ pub static LIB_SEARCH_DIRS: [&str; 1] = [
 
 #[cfg(target_os = "linux")]
 pub static PLUGIN_SEARCH_DIRS: [&str; 1] = [
-    // "./lib/mupen64plus-bundle-linux64-2.5"
+    // "./lib/mupen64plus-bundle-linux64-2.5.9"
     // "/usr/local/lib/mupen64plus",
     // "/usr/lib64/mupen64plus",
     "/usr/lib/mupen64plus",

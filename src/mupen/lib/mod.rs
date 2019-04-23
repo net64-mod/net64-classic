@@ -16,16 +16,20 @@ pub use self::plugin::*;
 pub use self::types::*;
 pub use self::video::*;
 
+use libc::{c_char, c_int};
+
+#[repr(C)]
 pub struct Mupen64Plus {
-    lib: Library,
+    lib: Box<Library>,
 }
 
 impl From<Library> for Mupen64Plus {
     fn from(lib: Library) -> Self {
-        Mupen64Plus { lib }
+        Mupen64Plus { lib: Box::new(lib) }
     }
 }
 
+#[repr(C)]
 #[derive(Debug)]
 pub struct Mupen64PlusPlugin {
     lib: Library,
@@ -34,5 +38,32 @@ pub struct Mupen64PlusPlugin {
 impl From<Library> for Mupen64PlusPlugin {
     fn from(lib: Library) -> Self {
         Mupen64PlusPlugin { lib }
+    }
+}
+
+#[derive(Debug)]
+pub struct Version {
+    plugin_type: M64pPluginType,
+    plugin_version: c_int,
+    api_version: c_int,
+    plugin_name: c_char,
+    capabilities: c_int,
+}
+
+impl Version {
+    pub fn new(
+        plugin_type: M64pPluginType,
+        plugin_version: c_int,
+        api_version: c_int,
+        plugin_name: c_char,
+        capabilities: c_int,
+    ) -> Self {
+        Version {
+            plugin_type,
+            plugin_version,
+            api_version,
+            plugin_name,
+            capabilities,
+        }
     }
 }

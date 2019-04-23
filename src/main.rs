@@ -16,6 +16,5 @@ use relm::Widget;
 fn main() {
     let core = Core::new();
     core.run();
-    core.startup_plugins();
     // Frontend::run(()).unwrap();
 }

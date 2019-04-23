@@ -3,12 +3,11 @@ use super::Mupen64Plus;
 
 use libc::{c_char, c_int};
 use libloading::Symbol;
-use std::ffi::CStr;
 
 type CoreGetAPIVersions = unsafe fn(*mut c_int, *mut c_int, *mut c_int, *mut c_int) -> M64pError;
 
 type PluginGetVersion =
-    unsafe fn(*mut M64pPluginType, *mut c_int, *mut c_int, *const CStr, *mut c_int) -> M64pError;
+    unsafe fn(*mut M64pPluginType, *mut c_int, *mut c_int, *mut c_char, *mut c_int) -> M64pError;
 
 type CoreErrorMessage = unsafe fn(m64p_error: M64pError) -> *const c_char;
 
@@ -33,7 +32,7 @@ impl Mupen64Plus {
         plugin_type: &mut M64pPluginType,
         plugin_version: &mut c_int,
         api_version: &mut c_int,
-        plugin_name: &CStr,
+        plugin_name: &mut c_char,
         capabilities: &mut c_int,
     ) -> M64pError {
         unsafe {

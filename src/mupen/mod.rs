@@ -1,4 +1,5 @@
+mod core;
 mod lib;
-mod mupen;
+mod plugin;
 
-pub use mupen::*;
+pub use self::core::*;

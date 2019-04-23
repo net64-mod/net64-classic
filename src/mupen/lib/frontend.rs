@@ -20,11 +20,7 @@ type CoreAttachPlugin = unsafe fn(M64pPluginType, *const c_void) -> M64pError;
 
 type CoreDetachPlugin = unsafe fn(M64pPluginType) -> M64pError;
 
-type CoreDoCommand = unsafe fn(
-    M64pCommand,
-    c_int,
-    *const c_void,
-) -> M64pError;
+type CoreDoCommand = unsafe fn(M64pCommand, c_int, *const c_void) -> M64pError;
 
 impl Mupen64Plus {
     pub fn core_startup(
@@ -89,8 +85,7 @@ impl Mupen64Plus {
         param_ptr: *const c_void,
     ) -> M64pError {
         unsafe {
-            let core_do_command: Symbol<CoreDoCommand> =
-                self.lib.get(b"CoreDoCommand").unwrap();
+            let core_do_command: Symbol<CoreDoCommand> = self.lib.get(b"CoreDoCommand").unwrap();
 
             core_do_command(command, param_int, param_ptr)
         }
