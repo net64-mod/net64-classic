@@ -43,27 +43,9 @@ impl From<Library> for Mupen64PlusPlugin {
 
 #[derive(Debug)]
 pub struct Version {
-    plugin_type: M64pPluginType,
-    plugin_version: c_int,
-    api_version: c_int,
-    plugin_name: c_char,
-    capabilities: c_int,
-}
-
-impl Version {
-    pub fn new(
-        plugin_type: M64pPluginType,
-        plugin_version: c_int,
-        api_version: c_int,
-        plugin_name: c_char,
-        capabilities: c_int,
-    ) -> Self {
-        Version {
-            plugin_type,
-            plugin_version,
-            api_version,
-            plugin_name,
-            capabilities,
-        }
-    }
+    pub plugin_type: M64pPluginType,
+    pub plugin_version: c_int,
+    pub api_version: c_int,
+    pub plugin_name: c_char,
+    pub capabilities: c_int,
 }

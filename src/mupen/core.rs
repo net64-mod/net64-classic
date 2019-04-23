@@ -143,13 +143,13 @@ impl MupenCore {
             &mut capabilities,
         );
         match m64p_error {
-            M64pError::Success => Ok(Version::new(
+            M64pError::Success => Ok(Version {
                 plugin_type,
                 plugin_version,
                 api_version,
                 plugin_name,
                 capabilities,
-            )),
+            }),
             _ => Err(MupenError::new(lib, m64p_error)),
         }
     }
@@ -186,7 +186,7 @@ impl MupenCore {
         let state_callback = std::ptr::null();
         unsafe {
             let m64p_error = self.lib.core_startup(
-                0x20101, // self.versions.config_version,
+                self.version.api_version,
                 &*config_path,
                 &*data_path,
                 &*context,

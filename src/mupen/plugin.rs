@@ -45,13 +45,13 @@ impl MupenPlugin {
             &mut capabilities,
         );
         match m64p_error {
-            M64pError::Success => Ok(Version::new(
+            M64pError::Success => Ok(Version {
                 plugin_type,
                 plugin_version,
                 api_version,
                 plugin_name,
                 capabilities,
-            )),
+            }),
             _ => Err(MupenError::new(mupen, m64p_error)),
         }
     }
