@@ -204,9 +204,9 @@ impl MupenCore {
 
     fn startup_plugins(&self) -> Result<(), MupenError> {
         self.startup_video_plugin()?;
-        // self.startup_audio_plugin()?;
-        // self.startup_input_plugin()?;
-        // self.startup_rsp_plugin()?;
+        self.startup_audio_plugin()?;
+        self.startup_input_plugin()?;
+        self.startup_rsp_plugin()?;
         Ok(())
     }
 
@@ -223,44 +223,41 @@ impl MupenCore {
         }
     }
 
-    // fn startup_audio_plugin(&self) -> Result<(), MupenError> {
-    //     let context = std::ptr::null();
-    //     let debug_callback = None;
-    //     let m64p_error = self
-    //         .plugins
-    //         .audio
-    //         .plugin_startup(&self.lib, context, debug_callback);
-    //     match m64p_error {
-    //         M64pError::Success => Ok(()),
-    //         _ => Err(MupenError::new(&self.lib, m64p_error)),
-    //     }
-    // }
+    fn startup_audio_plugin(&self) -> Result<(), MupenError> {
+        let context = std::ptr::null();
+        let debug_callback = None;
+        let m64p_error = self
+            .plugins
+            .audio
+            .startup(&self.lib, context, debug_callback);
+        match m64p_error {
+            M64pError::Success => Ok(()),
+            _ => Err(MupenError::new(&self.lib, m64p_error)),
+        }
+    }
 
-    // fn startup_input_plugin(&self) -> Result<(), MupenError> {
-    //     let context = std::ptr::null();
-    //     let debug_callback = None;
-    //     let m64p_error = self
-    //         .plugins
-    //         .input
-    //         .plugin_startup(&self.lib, context, debug_callback);
-    //     match m64p_erroLibraryr {
-    //         M64pError::Success => Ok(()),
-    //         _ => Err(MupenError::new(&self.lib, m64p_error)),
-    //     }
-    // }
+    fn startup_input_plugin(&self) -> Result<(), MupenError> {
+        let context = std::ptr::null();
+        let debug_callback = None;
+        let m64p_error = self
+            .plugins
+            .input
+            .startup(&self.lib, context, debug_callback);
+        match m64p_error {
+            M64pError::Success => Ok(()),
+            _ => Err(MupenError::new(&self.lib, m64p_error)),
+        }
+    }
 
-    // fn startup_rsp_plugin(&self) -> Result<(), MupenError> {
-    //     let context = std::ptr::null();
-    //     let debug_callback = None;
-    //     let m64p_error = self
-    //         .plugins
-    //         .rsp
-    //         .plugin_startup(&self.lib, context, debug_callback);
-    //     match m64p_error {
-    //         M64pError::Success => Ok(()),
-    //         _ => Err(MupenError::new(&self.lib, m64p_error)),
-    //     }
-    // }
+    fn startup_rsp_plugin(&self) -> Result<(), MupenError> {
+        let context = std::ptr::null();
+        let debug_callback = None;
+        let m64p_error = self.plugins.rsp.startup(&self.lib, context, debug_callback);
+        match m64p_error {
+            M64pError::Success => Ok(()),
+            _ => Err(MupenError::new(&self.lib, m64p_error)),
+        }
+    }
 
     pub fn open_rom(&self) -> Result<(), MupenError> {
         let m64p_error = self.lib.core_do_command(
