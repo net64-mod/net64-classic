@@ -19,5 +19,6 @@ impl App {
         self.core
             .attach_plugins()
             .expect("MupenCore#attach_plugins failed");
+        self.core.start_emulation().expect("MupenCore#start_emulation failed");
     }
 }

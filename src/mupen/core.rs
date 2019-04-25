@@ -290,4 +290,14 @@ impl MupenCore {
             _ => Err(MupenError::new(&self.lib, m64p_error)),
         }
     }
+
+    pub fn start_emulation(&self) -> Result<(), MupenError> {
+        let m64p_error = self
+            .lib
+            .core_do_command(M64pCommand::Execute, 0, std::ptr::null());
+        match m64p_error {
+            M64pError::Success => Ok(()),
+            _ => Err(MupenError::new(&self.lib, m64p_error)),
+        }
+    }
 }
