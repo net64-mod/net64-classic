@@ -15,6 +15,9 @@ impl App {
     }
 
     pub fn run(&self) {
-        self.core.open_rom().expect("Core run failed");
+        self.core.open_rom().expect("MupenCore#open_rom failed");
+        self.core
+            .attach_plugins()
+            .expect("MupenCore#attach_plugins failed");
     }
 }

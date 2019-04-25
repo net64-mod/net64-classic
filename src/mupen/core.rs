@@ -271,21 +271,23 @@ impl MupenCore {
         }
     }
 
-    // pub fn plugin_startup(&self) -> Result<(), MupenError> {
-    //     unsafe {
-    //         let m64p_error = PluginStartup(
-    //             self.versions.config_version,
-    //             config_path,
-    //             data_path,
-    //             context,
-    //             debug_callback,
-    //             context2,
-    //             state_callback,
-    //         );
-    //         match m64p_error {
-    //             M64pError::Success => Ok(()),
-    //             _ => Err(m64p_error.into()),
-    //         }
-    //     }
-    // }
+    pub fn attach_plugins(&self) -> Result<(), MupenError> {
+        self.attach_plugin(M64pPluginType::Gfx, self.plugins.video.get_handle())?;
+        self.attach_plugin(M64pPluginType::Audio, self.plugins.audio.get_handle())?;
+        self.attach_plugin(M64pPluginType::Input, self.plugins.input.get_handle())?;
+        self.attach_plugin(M64pPluginType::Rsp, self.plugins.rsp.get_handle())?;
+        Ok(())
+    }
+
+    pub fn attach_plugin(
+        &self,
+        plugin_type: M64pPluginType,
+        plugin_handle: *const c_void,
+    ) -> Result<(), MupenError> {
+        let m64p_error = self.lib.core_attach_plugin(plugin_type, plugin_handle);
+        match m64p_error {
+            M64pError::Success => Ok(()),
+            _ => Err(MupenError::new(&self.lib, m64p_error)),
+        }
+    }
 }

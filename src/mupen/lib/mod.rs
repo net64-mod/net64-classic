@@ -16,7 +16,7 @@ pub use self::plugin::*;
 pub use self::types::*;
 pub use self::video::*;
 
-use libc::{c_char, c_int};
+use libc::{c_char, c_int, c_void};
 
 #[repr(C)]
 pub struct Mupen64Plus {
@@ -33,6 +33,12 @@ impl From<Library> for Mupen64Plus {
 #[derive(Debug)]
 pub struct Mupen64PlusPlugin {
     lib: Library,
+}
+
+impl Mupen64PlusPlugin {
+    pub fn get_handle(&self) -> *const c_void {
+        self.lib.get_handle()
+    }
 }
 
 impl From<Library> for Mupen64PlusPlugin {

@@ -1,9 +1,6 @@
-use super::lib::{
-    M64pCommand, M64pError, M64pPluginType, Mupen64Plus, Mupen64PlusPlugin, MupenError, Version,
-};
+use super::lib::{M64pError, M64pPluginType, Mupen64Plus, Mupen64PlusPlugin, MupenError, Version};
 
 use libc::{c_char, c_int, c_void};
-use libloading::Library;
 
 #[derive(Debug)]
 pub struct MupenPlugin {
@@ -26,6 +23,10 @@ impl MupenPlugin {
         debug_callback: Option<extern "C" fn(*const c_void, c_int, *const c_char)>,
     ) -> M64pError {
         self.lib.plugin_startup(core, context, debug_callback)
+    }
+
+    pub fn get_handle(&self) -> *const c_void {
+        self.lib.get_handle()
     }
 
     fn get_plugin_version(
