@@ -1,20 +1,13 @@
 [package]
 authors = ["Mario Reder <mreder1289@gmail.com>"]
-build = "build.rs"
 edition = "2018"
 name = "net64-classic"
 version = "0.1.0"
-[build-dependencies]
-pkg-config = "*"
 
 [dependencies]
-byteorder = "*"
-gtk = "*"
-libc = "*"
-nix = "*"
-relm = "*"
-relm-derive = "*"
-sysinfo = "*"
+byteorder = "1.3"
+libc = "0.2"
+nix = "0.13"
 
 [dependencies.libloading]
-path = "../rust_libloading"
+git = "https://github.com/Tarnadas/rust_libloading"
