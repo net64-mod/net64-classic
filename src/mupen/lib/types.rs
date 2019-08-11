@@ -1,4 +1,4 @@
-use libc::{c_int, c_uint};
+use libc::{c_char, c_int, c_uint};
 
 const CONFIG_VERSION: c_int = 131840;
 const DEBUG_VERSION: c_int = 131072;
@@ -85,4 +85,43 @@ pub enum M64pParamType {
     Float = 2,
     Bool = 3,
     String = 4,
+}
+
+#[repr(C)]
+pub enum M64pGlAttr {
+    DoubleBuffer = 1,
+  BufferSize,
+  DepthSize,
+  RedSize,
+  GreenSize,
+  BlueSize,
+  AlphaSize,
+  SwapControl,
+  MultiSampleBuffer,
+  MultiSampleSamples,
+  ContextMajorVersion,
+  ContextMinorVersion,
+  ContextProfileMask
+}
+
+#[repr(C)]
+pub struct M64pVidExtFunctions {
+    functions: c_uint,
+    VidExtFuncInit: extern "C" fn() -> M64pError,
+    VidExtFuncQuit: extern "C" fn() -> M64pError,
+    VidExtFuncListModes: extern "C" fn(*const M64p2dSize, *const c_int) -> M64pError,
+    VidExtFuncSetMode: extern "C" fn(c_int, c_int, c_int, c_int, c_int) -> M64pError,
+    VidExtFuncGLGetProc: extern "C" fn(*const c_char) -> M64pError,
+    VidExtFuncGLSetAttr: extern "C" fn() -> M64pError,
+    VidExtFuncQuit: extern "C" fn() -> M64pError,
+    VidExtFuncQuit: extern "C" fn() -> M64pError,
+    VidExtFuncQuit: extern "C" fn() -> M64pError,
+    VidExtFuncQuit: extern "C" fn() -> M64pError,
+    VidExtFuncQuit: extern "C" fn() -> M64pError,
+    // m64p_error (*VidExtFuncGLSetAttr)(m64p_GLattr, int);
+    // m64p_error (*VidExtFuncGLGetAttr)(m64p_GLattr, int *);
+    // m64p_error (*VidExtFuncGLSwapBuf)(void);
+    // m64p_error (*VidExtFuncSetCaption)(const char *);
+    // m64p_error (*VidExtFuncToggleFS)(void);
+    // m64p_error (*VidExtFuncResizeWindow)(int, int);
 }

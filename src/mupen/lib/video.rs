@@ -1,22 +1,30 @@
+
 use super::types::*;
 use super::Mupen64Plus;
 
 use libc::{c_char, c_int};
 use libloading::Symbol;
 
+#[allow(non_camel_case_types)]
 type VidExt_Init = unsafe fn() -> M64pError;
 
+#[allow(non_camel_case_types)]
 type VidExt_Quit = unsafe fn() -> M64pError;
 
+#[allow(non_camel_case_types)]
 type VidExt_ListFullscreenModes = unsafe fn(*const M64p2dSize, *const c_int) -> M64pError;
 
+#[allow(non_camel_case_types)]
 type VidExt_SetVideoMode =
     unsafe fn(c_int, c_int, c_int, M64pVideoMode, M64pVideoFlags) -> M64pError;
 
+#[allow(non_camel_case_types)]
 type VidExt_SetCaption = unsafe fn(title: *const c_char) -> M64pError;
 
+#[allow(non_camel_case_types)]
 type VidExt_ToggleFullScreen = unsafe fn() -> M64pError;
 
+#[allow(non_camel_case_types)]
 type VidExt_ResizeWindow = unsafe fn(width: c_int, height: c_int) -> M64pError;
 
 impl Mupen64Plus {

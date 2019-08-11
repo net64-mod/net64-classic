@@ -1,2 +1,4 @@
-pub mod app;
-pub mod emulator;
+mod app;
+mod emulator;
+
+pub use app::App;

@@ -1,53 +1,43 @@
-use gtk::{Inhibit, WidgetExt, Window, WindowType};
-use relm::{Relm, Update, Widget};
-
-#[derive(Msg)]
-pub enum Msg {
-    Quit,
-}
-
-pub struct Model {}
+use azul::azul_dependencies::glium::Surface;
+use azul::prelude::{App as AzulApp, *};
 
 pub struct App {
-    model: Model,
-    window: Window,
+    azul_app: AzulApp<OpenGlAppState>,
+    window: Window<OpenGlAppState>,
 }
 
-impl Update for App {
-    type Model = Model;
-    type ModelParam = ();
-    type Msg = Msg;
-
-    fn model(_: &Relm<Self>, _: ()) -> Model {
-        Model {}
-    }
-
-    fn update(&mut self, event: Msg) {
-        match event {
-            Msg::Quit => gtk::main_quit(),
-        }
+impl App {
+    pub fn new() {
+        let mut azul_app = AzulApp::new(OpenGlAppState {}, AppConfig::default()).unwrap();
+        let window = azul_app
+            .create_window(WindowCreateOptions::default(), css::native())
+            .unwrap();
+        azul_app.run(window).unwrap();
     }
 }
 
-impl Widget for App {
-    type Root = Window;
+struct OpenGlAppState {}
 
-    fn root(&self) -> Self::Root {
-        self.window.clone()
+impl Layout for OpenGlAppState {
+    fn layout(&self, _: LayoutInfo<Self>) -> Dom<Self> {
+        Dom::gl_texture(
+            GlTextureCallback(render_my_texture),
+            StackCheckedPointer::new(self, self).unwrap(),
+        )
     }
+}
 
-    fn view(relm: &Relm<Self>, model: Self::Model) -> Self {
-        let window = Window::new(WindowType::Toplevel);
+fn render_my_texture(
+    state: &StackCheckedPointer<OpenGlAppState>,
+    info: LayoutInfo<OpenGlAppState>,
+    hi_dpi_bounds: HidpiAdjustedBounds,
+) -> Option<Texture> {
+    let physical_size = hi_dpi_bounds.get_physical_size();
+    let texture = info
+        .window
+        .read_only_window()
+        .create_texture(physical_size.width as u32, physical_size.height as u32);
 
-        connect!(
-            relm,
-            window,
-            connect_delete_event(_, _),
-            return (Some(Msg::Quit), Inhibit(false))
-        );
-
-        window.show_all();
-
-        App { model, window }
-    }
+    texture.as_surface().clear_color(1.0, 0.0, 0.0, 1.0);
+    Some(texture)
 }
